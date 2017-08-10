@@ -1,6 +1,6 @@
-FROM debian:jessie-slim
+FROM debian:stretch-slim
 
-# Prerequis suricata
+# suricata requirements
 RUN apt-get update \
     && apt-get -y install libpcre3 libpcre3-dbg libpcre3-dev \
     build-essential autoconf automake libtool libpcap-dev libnet1-dev \
@@ -9,7 +9,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Suricata installation
-ENV SURICATA_VERSION 3.2.1
+ENV SURICATA_VERSION 4.0.0
 RUN wget http://www.openinfosecfoundation.org/download/suricata-$SURICATA_VERSION.tar.gz \
     && tar -xvzf suricata-$SURICATA_VERSION.tar.gz \
     && cd suricata-$SURICATA_VERSION \
@@ -19,7 +19,7 @@ RUN wget http://www.openinfosecfoundation.org/download/suricata-$SURICATA_VERSIO
 COPY suricata.yml.tpl /etc/suricata/suricata.yml.tpl
 
 # Filebeat installation
-ENV FILEBEAT_VERSION 5.4.0
+ENV FILEBEAT_VERSION 5.5.1
 ENV FILEBEAT_TAG filebeat
 RUN wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-$FILEBEAT_VERSION-amd64.deb \
     && dpkg -i filebeat-$FILEBEAT_VERSION-amd64.deb
