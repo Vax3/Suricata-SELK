@@ -27,9 +27,9 @@ function render-template {
 sysctl -w net.ipv4.ip_forward=1
 ethtool -K eth0 tx off rx off sg off gso off gro off
 
-render-template /etc/filebeat/filebeat.yml.tpl > /etc/filebeat/filebeat.yml && rm /etc/filebeat/filebeat.yml.tpl
+render-template /filebeat/filebeat.yml.tpl > /filebeat/filebeat.yml && rm /filebeat/filebeat.yml.tpl
 render-template /etc/suricata/suricata.yml.tpl > /etc/suricata/suricata.yaml && rm /etc/suricata/suricata.yml.tpl
 
 # Services start
-service filebeat start
-suricata -i eth0 -c /etc/suricata/suricata.yaml
+suricata -i eth0 -c /etc/suricata/suricata.yaml &
+/filebeat/filebeat -e -c /filebeat/filebeat.yml

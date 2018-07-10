@@ -1,17 +1,25 @@
-FROM debian:stretch-slim
+FROM alpine:latest
 
 # suricata requirements
-RUN apt-get update \
-    && apt-get -y install libpcre3 libpcre3-dbg libpcre3-dev \
-    build-essential autoconf automake libtool libpcap-dev libnet1-dev \
-    libyaml-0-2 libyaml-dev zlib1g zlib1g-dev libmagic-dev libcap-ng-dev \
-    libjansson-dev pkg-config wget ethtool \
-    && rm -rf /var/lib/apt/lists/*
+ENV YAML_VERSION=0.2.1
+RUN apk update \
+    && apk add libpcre2-32 pcre-dev \
+    build-base autoconf automake libtool libpcap-dev libnet-dev \
+    perl-yaml-libyaml zlib-dev libmagic libcap-ng-dev \
+    jansson-dev pkgconf gcompat wget ethtool \
+    && wget http://pyyaml.org/download/libyaml/yaml-$YAML_VERSION.tar.gz \
+    && tar xzf yaml-$YAML_VERSION.tar.gz \
+    && rm yaml-$YAML_VERSION.tar.gz \
+    && cd yaml-$YAML_VERSION \
+    && ./configure \
+    && make \
+    && make install
 
 # Suricata installation
-ENV SURICATA_VERSION 4.0.0
+ENV SURICATA_VERSION 4.0.4
 RUN wget http://www.openinfosecfoundation.org/download/suricata-$SURICATA_VERSION.tar.gz \
     && tar -xvzf suricata-$SURICATA_VERSION.tar.gz \
+    && rm suricata-$SURICATA_VERSION.tar.gz \
     && cd suricata-$SURICATA_VERSION \
     && ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
     && make \
@@ -19,11 +27,14 @@ RUN wget http://www.openinfosecfoundation.org/download/suricata-$SURICATA_VERSIO
 COPY suricata.yml.tpl /etc/suricata/suricata.yml.tpl
 
 # Filebeat installation
-ENV FILEBEAT_VERSION 5.5.1
-ENV FILEBEAT_TAG filebeat
-RUN wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-$FILEBEAT_VERSION-amd64.deb \
-    && dpkg -i filebeat-$FILEBEAT_VERSION-amd64.deb
-COPY filebeat.yml.tpl /etc/filebeat/filebeat.yml.tpl
+#ENV FILEBEAT_VERSION 5.5.1
+ENV FILEBEAT_VERSION 6.3.0
+RUN wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-$FILEBEAT_VERSION-linux-x86_64.tar.gz \
+    && tar xzf filebeat-$FILEBEAT_VERSION-linux-x86_64.tar.gz \
+    && rm filebeat-$FILEBEAT_VERSION-linux-x86_64.tar.gz \
+    && mv filebeat-$FILEBEAT_VERSION-linux-x86_64 filebeat
+
+COPY filebeat.yml.tpl /filebeat/filebeat.yml.tpl
 
 ADD entrypoint.sh /
 
