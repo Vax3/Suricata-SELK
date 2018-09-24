@@ -16,7 +16,7 @@ RUN apk update \
     && make install
 
 # Suricata installation
-ENV SURICATA_VERSION 4.0.4
+ENV SURICATA_VERSION 4.0.5
 RUN wget http://www.openinfosecfoundation.org/download/suricata-$SURICATA_VERSION.tar.gz \
     && tar -xvzf suricata-$SURICATA_VERSION.tar.gz \
     && rm suricata-$SURICATA_VERSION.tar.gz \
@@ -27,8 +27,7 @@ RUN wget http://www.openinfosecfoundation.org/download/suricata-$SURICATA_VERSIO
 COPY suricata.yml.tpl /etc/suricata/suricata.yml.tpl
 
 # Filebeat installation
-#ENV FILEBEAT_VERSION 5.5.1
-ENV FILEBEAT_VERSION 6.3.0
+ENV FILEBEAT_VERSION 6.4.0
 RUN wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-$FILEBEAT_VERSION-linux-x86_64.tar.gz \
     && tar xzf filebeat-$FILEBEAT_VERSION-linux-x86_64.tar.gz \
     && rm filebeat-$FILEBEAT_VERSION-linux-x86_64.tar.gz \
